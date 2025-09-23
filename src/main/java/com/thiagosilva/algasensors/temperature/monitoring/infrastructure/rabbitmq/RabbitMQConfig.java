@@ -20,6 +20,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    public static final String QUEUE_NAME = "temperature-monitoring.process-temperature.v1.q";
+    public static final String FANOUT_EXCHANGE_NAME = "temperature-processing.temperature-received.v1.e";
+
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory factory) {
         return new RabbitAdmin(factory);
@@ -27,7 +30,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queue() {
-        return QueueBuilder.durable("temperature-monitoring.process-temperature.v1.q").build();
+        return QueueBuilder.durable(QUEUE_NAME).build();
     }
 
     /*
@@ -39,7 +42,7 @@ public class RabbitMQConfig {
      */
     public FanoutExchange exchange() {
         return ExchangeBuilder.fanoutExchange(
-                "temperature-processing.temperature-received.v1.e").build();
+                FANOUT_EXCHANGE_NAME).build();
     }
 
     /*
