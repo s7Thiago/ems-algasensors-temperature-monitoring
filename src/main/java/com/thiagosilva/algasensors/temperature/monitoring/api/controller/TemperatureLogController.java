@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thiagosilva.algasensors.temperature.monitoring.api.model.TemperatureLogOutput;
+import com.thiagosilva.algasensors.temperature.monitoring.api.model.TemperatureLogData;
 import com.thiagosilva.algasensors.temperature.monitoring.domain.model.SensorId;
 import com.thiagosilva.algasensors.temperature.monitoring.domain.model.TemperatureLog;
 import com.thiagosilva.algasensors.temperature.monitoring.domain.repository.TemperatureLogRepository;
@@ -26,12 +26,12 @@ public class TemperatureLogController {
     private final TemperatureLogRepository repository;
 
     @GetMapping("")
-    public Page<TemperatureLogOutput> search(
+    public Page<TemperatureLogData> search(
             @PathVariable("sensorId") TSID sensorId,
             @PageableDefault Pageable pageable) {
         Page<TemperatureLog> logs = repository.findAllBySensorId(new SensorId(sensorId), pageable);
 
-        return logs.map(log -> TemperatureLogOutput.builder()
+        return logs.map(log -> TemperatureLogData.builder()
                 .id(log.getId().getValue())
                 .value(log.getValue())
                 .registeredAt(log.getRegisteredAt())

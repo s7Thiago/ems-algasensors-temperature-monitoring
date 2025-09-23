@@ -8,8 +8,11 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*
  * Este é um serviço consumidor. por isso, não será configurado o bean de uma exchange
@@ -22,6 +25,16 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_NAME = "temperature-monitoring.process-temperature.v1.q";
     public static final String FANOUT_EXCHANGE_NAME = "temperature-processing.temperature-received.v1.e";
+
+    /*
+     * Carrega o bean do jackson para dentro do rabbitmq deste microserviço
+     * fazendo com que os payloads complexos que forem publicados ou lidos
+     * aqui sejam serializados para json automaticamente
+    */
+    @Bean
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper mapper) {
+        return new Jackson2JsonMessageConverter(mapper);
+    }
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory factory) {
