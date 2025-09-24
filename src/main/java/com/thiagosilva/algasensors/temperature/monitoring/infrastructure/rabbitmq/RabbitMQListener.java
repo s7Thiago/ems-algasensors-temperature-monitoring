@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.thiagosilva.algasensors.temperature.monitoring.api.model.TemperatureLogData;
+import com.thiagosilva.algasensors.temperature.monitoring.domain.service.TemperatureMonitoringService;
 
 import io.hypersistence.tsid.TSID;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RabbitMQListener {
 
+    private final TemperatureMonitoringService service;
+
     @SneakyThrows
     @RabbitListener(queues = QUEUE_NAME)
-    public void handle(
-            @Payload TemperatureLogData temperatureData,
-            @Headers Map<String, Object> headers) {
-        TSID sensorId = temperatureData.getSensorId();
-        Double temperature = temperatureData.getValue();
-        log.info("Temperature updated: SensorId {} Temp {}", sensorId, temperature);
-        log.info("Headers: {}", headers.toString());
-
+    public void handle(@Payload TemperatureLogData data) {
+        service.processTemperatureReading(data);
         Thread.sleep(Duration.ofSeconds(5));
     }
 
