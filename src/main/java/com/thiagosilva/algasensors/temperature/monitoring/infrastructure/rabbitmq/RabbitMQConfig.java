@@ -23,7 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String QUEUE_NAME = "temperature-monitoring.process-temperature.v1.q";
+    public static final String QUEUE_PROCESS_TEMPERATURE_NAME = "temperature-monitoring.process-temperature.v1.q";
+    public static final String QUEUE_ALERT_NAME = "temperature-monitoring.alerting.v1.q";
     public static final String FANOUT_EXCHANGE_NAME = "temperature-processing.temperature-received.v1.e";
 
     /*
@@ -42,8 +43,14 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue queue() {
-        return QueueBuilder.durable(QUEUE_NAME).build();
+    public Queue queueProcessTemperature() {
+        return QueueBuilder.durable(QUEUE_PROCESS_TEMPERATURE_NAME).build();
+    }
+
+
+    @Bean
+    public Queue queueProcessAlert() {
+        return QueueBuilder.durable(QUEUE_ALERT_NAME).build();
     }
 
     /*
@@ -59,12 +66,19 @@ public class RabbitMQConfig {
     }
 
     /*
-     * O Microsserviço de consumo mode ficar responsável por criar um Binding, pois
+     * O Microsserviço de consumo pode ficar responsável por criar o Binding
      */
     @Bean
-    public Binding binding() {
+    public Binding bindingProcessTemperature() {
         return BindingBuilder
-                .bind(queue())
+                .bind(queueProcessTemperature())
+                .to(exchange());
+    }
+
+    @Bean
+    public Binding bindingAlert() {
+        return BindingBuilder
+                .bind(queueProcessAlert())
                 .to(exchange());
     }
 
