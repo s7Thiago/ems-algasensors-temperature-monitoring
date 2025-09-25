@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.thiagosilva.algasensors.temperature.monitoring.api.model.TemperatureLogData;
+import com.thiagosilva.algasensors.temperature.monitoring.domain.service.SensorAlertService;
 import com.thiagosilva.algasensors.temperature.monitoring.domain.service.TemperatureMonitoringService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RabbitMQListener {
 
     private final TemperatureMonitoringService service;
+    private final SensorAlertService alertService;
 
     /*
      * O concurrency Faz com que o listener use de 2 a 3 threads para ler as
@@ -41,7 +43,7 @@ public class RabbitMQListener {
     @SneakyThrows
     @RabbitListener(queues = QUEUE_ALERT_NAME, concurrency = "2-3")
     public void handleAlertMessage(@Payload TemperatureLogData data) {
-        log.info("Alerting: sensorId {} Temp {}", data.getSensorId(), data.getValue());
+        alertService.handleAlert(data);
         Thread.sleep(Duration.ofSeconds(5));
     }
 
