@@ -24,4 +24,4 @@ spring:
       password: ${RABBITMQ_DEFAULT_PASS}
       listener:
         simple:
-          prefetch: 4 # define quantas mensagens cada consumer pode processar por vez
+          prefetch: 4 # define quantas mensagens cada instância desse consumer pode processar por vez
