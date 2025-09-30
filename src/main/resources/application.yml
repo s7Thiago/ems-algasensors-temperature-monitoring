@@ -16,7 +16,7 @@ spring:
       database-platform: org.hibernate.dialect.H2Dialect
       hibernate:
         ddl-auto: update
-      show-sql: 'true'
+      show-sql: 'false'
     rabbitmq:
       host: rabbitmq
       port: 5672
@@ -25,3 +25,13 @@ spring:
       listener:
         simple:
           prefetch: 4 # define quantas mensagens cada instância desse consumer pode processar por vez
+          retry:
+          # a cada <initial-interval> segundos tenta reprocessar a mensagem por
+          # no máximo <max-interval> segundos, a cada nova tentativa o tempo de
+          # espera é multiplicado por <multiplier>, até o máximo de <max-attempts>
+          #  tentativas
+            enabled: true
+            initial-interval: 10s # intervalo de tempo entre tentativas de reprocessamento
+            max-interval: 20s
+            max-attempts: 3
+            multiplier: 2

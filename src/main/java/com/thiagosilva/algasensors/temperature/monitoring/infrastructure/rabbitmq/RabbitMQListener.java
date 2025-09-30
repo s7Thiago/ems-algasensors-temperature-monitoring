@@ -37,14 +37,14 @@ public class RabbitMQListener {
     @RabbitListener(queues = QUEUE_PROCESS_TEMPERATURE_NAME, concurrency = "2-3")
     public void handleTemepratureProcessing(@Payload TemperatureLogData data) {
         service.processTemperatureReading(data);
-        Thread.sleep(Duration.ofSeconds(5));
+        // Thread.sleep(Duration.ofSeconds(5));
     }
 
     @SneakyThrows
     @RabbitListener(queues = QUEUE_ALERT_NAME, concurrency = "2-3")
     public void handleAlertMessage(@Payload TemperatureLogData data) {
         alertService.handleAlert(data);
-        Thread.sleep(Duration.ofSeconds(5));
+        // Thread.sleep(Duration.ofSeconds(5));
     }
 
 }
