@@ -1,5 +1,7 @@
 package com.thiagosilva.algasensors.temperature.monitoring.infrastructure.rabbitmq;
 
+import java.util.Map;
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.ExchangeBuilder;
@@ -23,7 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String QUEUE_PROCESS_TEMPERATURE_NAME = "temperature-monitoring.process-temperature.v1.q";
+    private static final String BASE_QUEUE_PROCESS_TEMPERATURE_NAME = "temperature-monitoring.process-temperature.v1";
+
+    public static final String QUEUE_PROCESS_TEMPERATURE_NAME = BASE_QUEUE_PROCESS_TEMPERATURE_NAME + ".q";
+    public static final String DLQ_PROCESS_TEMPERATURE_NAME = BASE_QUEUE_PROCESS_TEMPERATURE_NAME + ".dlq";
+
     public static final String QUEUE_ALERT_NAME = "temperature-monitoring.alerting.v1.q";
     public static final String FANOUT_EXCHANGE_NAME = "temperature-processing.temperature-received.v1.e";
 
@@ -44,7 +50,23 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queueProcessTemperature() {
-        return QueueBuilder.durable(QUEUE_PROCESS_TEMPERATURE_NAME).build();
+        Map<String, Object> args = Map.of(
+            "x-dead-letter-exchange", "", // é opcional ter uma exchange para enviar a DLQ
+            "x-dead-letter-routing-key", DLQ_PROCESS_TEMPERATURE_NAME // sem uma exchange configurada, uma direct exchange 
+                                                                      // padrão é usada, mas é necessário informar a routing
+                                                                      // key, que pode ser o mesmo nome da dlq
+        );
+
+        return QueueBuilder
+        .durable(QUEUE_PROCESS_TEMPERATURE_NAME)
+        .withArguments(args)
+        .build();
+    }
+
+    
+    @Bean
+    public Queue dlqProcessTemperature() {
+        return QueueBuilder.durable(DLQ_PROCESS_TEMPERATURE_NAME).build();
     }
 
 

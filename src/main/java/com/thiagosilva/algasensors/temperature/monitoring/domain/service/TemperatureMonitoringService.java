@@ -30,6 +30,10 @@ public class TemperatureMonitoringService {
     @Transactional
     public void processTemperatureReading(TemperatureLogData data) {
 
+        if (data.getValue() == 10.5) {
+            throw new RuntimeException("Simulated processing error");
+        }
+
         sensorMonitoringRepository.findById(new SensorId(data.getSensorId()))
                 .ifPresentOrElse(sensor -> handleSensorMonitoring(data, sensor), () -> logIgnoredTemperature(data));
 
